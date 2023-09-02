@@ -1,0 +1,238 @@
+help
+==========
+#creat keyspace
+CREATE KEYSPACE fma WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
+
+# checking keyspaces
+DESCRIBE KEYSPACES;
+
+# checking tables
+DESCRIBE TABLES;
+DESCRIBE TABLE part_one;
+
+# dropping keyspcae or table:
+DROP KEYSPACE fma;
+DROP TABLE part_one;
+
+# using fma keyspace
+use fma;
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$ raw query
+#first we should creat table, then import data by using copy
+CREATE TABLE part_one(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, temp int, PRIMARY KEY(title_album , title_track));
+
+# Importing data from csv into table
+   ### the location of the csv file is in cassandra folder in local C
+COPY part_one(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, temp) FROM 'fma_dataset.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+# viewing all data in our table
+SELECT * FROM part_one;
+
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$ 1)
+
+#first we should creat table, then import data by using copy
+CREATE TABLE part_one(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, temp int, PRIMARY KEY(title_album , title_track));
+
+# Importing data from csv into table
+   ### the location of the csv file is in cassandra folder in local C
+COPY part_one(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, temp) FROM 'fma_dataset.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+#query
+TRACING ON; SELECT title_TRACK FROM part_one where title_album='Rumble, Young Man, Rumble';
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 2)
+
+#first we should creat table, then import data by using copy
+CREATE TABLE part_two(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, temp int, PRIMARY KEY(artist , title_track));
+
+# Importing data from csv into table
+   ### the location of the csv file is in cassandra folder in local C
+COPY part_two(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, temp) FROM 'fma_dataset.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+#query
+TRACING ON; SELECT artist, title_track, genre FROM part_two where artist='RoccoW';
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 3)
+
+#first we should creat table, then import data by using copy
+CREATE TABLE part_three(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY(year, genre, duration));
+
+# Importing data from csv into table
+   ### the location of the csv file is in cassandra folder in local C
+COPY part_three(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv WITH DELIMITER=',' AND HEADER=TRUE;
+
+#query
+TRACING ON; SELECT title_track, duration, genre, year FROM part_three where genre='Hip-Hop' AND year in ('2015', '2016') AND duration < 180;
+
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 4)
+
+#first we should creat table, then import data by using copy
+CREATE TABLE part_four(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY(genre, month, listens_track));
+
+# Importing data from csv into table
+   ### the location of the csv file is in cassandra folder in local C
+COPY part_four(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+#query
+TRACING ON; SELECT title_track, genre, month, listens_track FROM part_four where genre in ('Electronic', 'Pop') AND month='Apr' AND listens_track > 300;
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 6)
+
+#first we should creat table, then import data by using copy
+CREATE TABLE part_six(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY(month, year));
+
+COPY part_six(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+CAPTURE; CAPTURE 'temp_6.csv'; SELECT genre, year, month, title_track FROM part_six where month in ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun') AND year='2008' ; 
+CAPTURE off;
+
+
+  
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 7)
+
+#first we should creat table, then import data by using copy
+CREATE TABLE part_seven(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, PRIMARY KEY(duration, title_track));
+
+# Importing data from csv into table
+   ### the location of the csv file is in cassandra folder in local C
+COPY part_seven(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+#query
+TRACING ON; SELECT AVG (duration) FROM part_seven;
+
+#### part2 of question 2:
+CREATE TABLE part_seven_2(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY(temp, duration));
+
+COPY part_seven_2(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+SELECT title_track, duration FROM part_seven_2 where temp=1  ORDER BY duration DESC LIMIT 10;
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 8)
+
+
+CREATE TABLE part_eight(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY((genre, year), favorites_album));
+
+COPY part_eight(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+TRACING ON; SELECT title_track, year, genre, favorites_album, favorites_artist  FROM part_eight where year='2016' AND genre='Rock' ORDER BY favorites_album DESC;
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 9)
+
+
+CREATE TABLE part_nine(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY(genre, listens_track));
+
+COPY part_nine(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+#using capture to write outpute as csv file in temp_9:
+
+CAPTURE; CAPTURE 'temp_9.csv'; SELECT genre, COUNT(listens_track) as counter, temp FROM part_nine GROUP BY genre;
+CAPTURE off;
+
+# second table:
+CREATE TABLE part_nine_2(genre text, counter int, temp int,  PRIMARY KEY(temp, counter ));
+
+COPY part_nine_2(genre, counter, temp ) FROM 'temp_9.csv' WITH DELIMITER='|' AND HEADER=TRUE;
+
+select genre, counter from part_nine_2 WHERE temp=1 ORDER BY counter DESC;
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$ 10)
+
+#table 1
+drop table part_ten; drop table part_ten_2;
+
+CREATE TABLE part_ten(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY(year, listens_album));
+
+COPY part_ten(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+-e"SELECT artist, listens_album, year, temp FROM part_ten WHERE year in ('2015', '2016', '2017') ;" > output.txt
+echo "SELECT artist, listens_album, year, temp FROM part_ten WHERE year in ('2015', '2016', '2017') ;" > select.cql
+
+CAPTURE; CAPTURE 'temp_10_1.csv'; SELECT artist, listens_album, year, temp FROM part_ten WHERE year in ('2015', '2016', '2017') ;
+CAPTURE off;
+
+
+
+
+
+
+# table 2
+CREATE TABLE part_ten_2(artist text, listens_album int, year text, temp int, PRIMARY KEY(artist, listens_album));
+
+COPY part_ten_2(artist, listens_album, year, temp) FROM 'temp_10_1.csv' WITH DELIMITER='|' AND HEADER=TRUE;
+
+CAPTURE; CAPTURE 'temp_10_2.csv'; SELECT artist, COUNT(listens_album) as cnt, temp, year FROM part_ten_2 GROUP BY artist;
+SELECT artist, COUNT(listens_album) as counter, year, temp FROM part_ten_2 GROUP BY artist ;
+CAPTURE off;
+
+
+
+
+
+# table3:
+
+CREATE TABLE part_ten_3(artist text, counter int, year text, temp int, PRIMARY KEY(temp, counter ));
+
+COPY part_ten_3(artist, counter, year, temp) FROM 'temp_10_2.csv' WITH DELIMITER='|' AND HEADER=TRUE;
+
+select artist, counter, year from part_ten_3 WHERE temp=1 ORDER BY counter DESC;
+
+
+
+
+
+
+
+
+CREATE TABLE part_ten(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY((artist, year), listens_album));
+
+COPY part_ten(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+
+CAPTURE; CAPTURE 'temp_10.csv'; SELECT artist, COUNT(listens_album) as counter, year, temp FROM part_ten GROUP BY artist, year ;
+CAPTURE off;
+
+# second table:
+
+drop table part_ten_2; CREATE TABLE part_ten_2(artist text, counter int, year text, temp int,  PRIMARY KEY((year, temp), counter )); COPY part_ten_2(artist, counter, year , temp ) FROM 'temp_10.csv' WITH DELIMITER='|' AND HEADER=TRUE; select artist, counter, year from part_ten_2 where temp=1 AND year='2017' ORDER BY counter limit 10;
+
+
+
+##################################################################################################33
+
+
+#table 1
+drop table part_ten; drop table part_ten_2;
+
+CREATE TABLE part_ten(track_id int, title_track text, date_released text, title_album text, artist text, duration int, genre text, favorites_artist int, listens_track int, favorites_track int, listens_album int, favorites_album int, year text, month text, temp int, PRIMARY KEY(year, listens_album));
+
+COPY part_ten(track_id, title_track, date_released, title_album, artist, duration, genre, favorites_artist, listens_track, favorites_track, listens_album, favorites_album, year, month, temp) FROM 'fma_dataset_edited.csv' WITH DELIMITER=',' AND HEADER=TRUE;
+
+CAPTURE; CAPTURE 'temp_10_2015_1.csv'; SELECT artist, listens_album, year FROM part_ten WHERE year = '2015' ;
+CAPTURE off;
+
+
+# table 2
+CREATE TABLE part_ten_2(artist text, listens_album int, year text, PRIMARY KEY(artist, year) );
+
+COPY part_ten_2(artist, listens_album, year) FROM 'temp_10_2015_1.csv' WITH DELIMITER='|' AND HEADER=TRUE;
+
+CAPTURE; CAPTURE 'temp_10_2015_2.csv'; SELECT artist, listens_album, year FROM part_ten_2 GROUP BY artist ;
+CAPTURE off;
+
+
+# table3:
+CREATE TABLE part_ten_3(artist text, counter int, year text, PRIMARY KEY(year, counter ));
+
+COPY part_ten_3(artist, counter, year) FROM 'temp_10_2015_2.csv' WITH DELIMITER='|' AND HEADER=TRUE;
+
+select artist, counter, year from part_ten_3 WHERE year='2015' ORDER BY counter DESC;
+
+
+

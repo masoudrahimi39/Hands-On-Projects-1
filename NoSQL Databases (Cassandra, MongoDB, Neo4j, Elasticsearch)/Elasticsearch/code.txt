@@ -1,0 +1,337 @@
+# inserting data
+POST /movies/_doc/1
+{
+    "title": "The Godfather",
+    "director": "Francis Ford Coppola",
+    "year": 1972
+}
+PUT movies/_doc/2
+{
+    "title": "Lawrence of Arabia",
+    "director": "David Lean",
+    "year": 1962,
+    "genres": ["Adventure", "Biography", "Drama"]
+}
+PUT movies/_doc/3
+{
+    "title": "To Kill a Mockingbird",
+    "director": "Robert Mulligan",
+    "year": 1962,
+    "genres": ["Crime", "Drama", "Mystery"]
+}
+PUT movies/_doc/4
+{
+    "title": "Apocalypse Now",
+    "director": "Francis Ford Coppola",
+    "year": 1979,
+    "genres": ["Drama", "War"]
+}
+PUT movies/_doc/5
+{
+    "title": "Kill Bill: Vol. 1",
+    "director": "Quentin Tarantino",
+    "year": 2003,
+    "genres": ["Action", "Crime", "Thriller"]
+}
+PUT movies/_doc/6
+{
+    "title": "The Assassination of Jesse James by the Coward Robert Ford",
+    "director": "Andrew Dominik",
+    "year": 2007,
+    "genres": ["Biography", "Crime", "Drama"]
+}  
+PUT movies/_doc/7
+{
+    "title": "Kill Bill: Vol. 2",
+    "director": "Quentin Tarantino",
+    "year": 2004,
+    "genres": ["Action", "Crime", "Thriller"]
+}
+PUT movies/_doc/8
+{
+    "title": "aa fake movie by me",
+    "director": "Andrew Dominik",
+    "year": 2003,
+    "genres": ["Biography", "Crime", "Drama"]
+}
+
+# "kill" in title
+POST /_search
+    {
+    "query": {
+    		"query_string": {
+   					 "query": "kill",
+  								  "fields": ["title"]
+    						}
+    			}
+    }
+  
+# "kill" or "ford" in title
+POST /_search
+    {
+    "query": {
+    		"query_string": {
+   					 "query": "kill OR ford",
+  								  "fields": ["title"]
+    						}
+    			}
+    }
+
+# getting all darama genres
+POST /movies/movie/_search
+    {
+   	 "query": {
+    		"match": {
+   				 "genres": "drama"
+    				}
+    			}
+    }
+
+# existing "kill" or "bill" in title
+    POST movies/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "Kill Bill",
+        "operator": "or"
+      }
+    }
+  }
+}
+
+# search on several fields at same time 
+POST /movies/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "ford",
+      "fields": [
+        "title^3",
+        "director"
+      ]
+    }
+  }
+}
+
+# combining of:  match, AND, OR
+   POST /movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "genres": "action"
+          }
+        },
+        {
+          "match": {
+            "title": {
+              "query":"kill",
+               "boost": 3
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+#using "must", "must_not","should"
+POST /movies/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "bool": {
+          "should": [
+            {
+              "match": {
+                "title": "ford"
+              }
+            },
+            {
+              "match": {
+                "title": "kill"
+              }
+            }
+          ]
+        }
+      },
+      "must_not": {
+        "match": {
+          "genres": "Mystery"
+        }
+      }
+    }
+  }
+}
+
+#searching non-string field
+GET /_search
+{
+  "query": {
+    "term": {
+      "year": {
+        "value": "2003",
+        "boost": 1.0
+      }
+    }
+  }
+}
+
+# filtering in search
+   POST /movies/movie/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "title": "kill"
+          }
+        }
+      ],
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "year": {
+                  "gte": 1960
+                }
+              }
+            },
+            {
+              "term": {
+                "genres": {
+                  "value": "drama"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+#above query summary
+POST /movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "title": "kill"
+          }
+        },
+        {
+          "range": {
+            "year": {
+              "gte": 1960
+            }
+          }
+        },
+        {
+          "term": {
+            "genres": {
+              "value": "drama"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+#filter on "genre" and "year" and not on text
+POST movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "range": {
+            "year": {
+              "gte": 2000
+            }
+          }
+        },
+        {
+          "term": {
+            "genres": {
+              "value": "drama"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+#searching in miss dictation
+POST /movies/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "godfater",
+        "fuzziness": "AUTO"
+      }
+    }
+  }
+}
+
+#accepting free space
+POST /movies/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": {
+        "query": "Kill Bill",
+        "slop": 2
+      }
+    }
+  }
+}
+
+### commons error
+    POST movies/movie/_search
+    {
+   	 "query": {
+   			 "term": {
+   				 "director": {
+   								 "value": "Francis Ford Coppola"
+    						}
+   					 }
+   			 }
+    }
+
+#
+    PUT /movies/movie/_mapping
+    {
+    "movie": {
+    		"properties": {
+    				"director": {
+    						"type": "text",
+    						"fields": {
+    							"original": {
+    											"type": "keyword"
+    										}
+    									}
+    							}
+    					}
+    		}
+    }
+  
+      POST movies/movie/_search
+    {
+    "query": {
+   		 "term": {
+    			"director.original": "Francis Ford Coppola"
+    		}
+    	}
+    }
